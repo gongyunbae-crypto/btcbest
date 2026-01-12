@@ -415,8 +415,6 @@ def get_expanded_indicators(df):
         'vwma_20': vwma_20, 'hma_9': hma_9, 'crsi': connors_rsi_proxy,
         'ultimate': ultimate, 'kst': kst_v, 'kst_sig': kst_signal_v
     }
-        'ultimate': ultimate, 'kst': kst, 'kst_signal': kst_signal
-    }
 
 class SignalRepository:
     """
