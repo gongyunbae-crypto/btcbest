@@ -136,15 +136,18 @@ def get_data(symbol, refresh=False):
 
 with st.spinner("Loading Data..."):
     df = get_data(symbol)
-    if df is not None:
+    if df is not None and not df.empty:
         st.session_state.df_global = df
         if 'composer' not in st.session_state: 
             st.session_state.composer = backtest.RandomStrategyComposer(df)
         elif not hasattr(st.session_state.composer, 'delete_strategy'):
             st.session_state.composer = backtest.RandomStrategyComposer(df)
     else:
-        st.error("❌ 데이터를 불러올 수 없습니다. 바이낸스 API가 이 서버의 IP를 차단했거나 CSV 파일이 없습니다. 앱의 'Refresh Data' 버튼은 작동하지 않을 수 있습니다.")
+        st.error("❌ 데이터를 불러올 수 없습니다. 바이낸스 API가 이 서버의 IP를 차단했거나 CSV 파일이 없습니다.")
+        if df is not None and df.empty:
+            st.warning("⚠️ 데이터프레임이 비어 있습니다. 잠시 후 다시 시도하거나 다른 심볼을 선택하세요.")
         st.stop()
+
             
         current_ts = time.time()
         if (current_ts % 300) < 10 and ('last_refresh' not in st.session_state or current_ts - st.session_state.last_refresh > 60):

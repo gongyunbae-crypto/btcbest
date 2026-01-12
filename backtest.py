@@ -207,7 +207,11 @@ def run_dca_backtest(df, long_signals, short_signals, leverage=1, base_sl=0.03, 
     # Run Fast Core with Switching
     equity_curve, trades_arr = _fast_dca_core_v2(closes, highs, lows, long_arr, short_arr, float(leverage), base_sl, base_tp)
     
+    if len(equity_curve) == 0:
+        return 0.0, 0.0, 0.0, 0, {} if not return_portfolio else MockPortfolio(pd.Series(), pd.DataFrame(), 0.0, 0.0, 0.0, 0)
+
     balance = equity_curve[-1]
+
     ret_pct = (balance - 10000.0)/10000.0
     
     peak = np.maximum.accumulate(equity_curve)
