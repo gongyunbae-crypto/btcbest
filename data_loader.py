@@ -4,7 +4,42 @@ import os
 import time
 from datetime import datetime, timedelta
 
+def fetch_binance_data_auto(symbol="BTC/USDT", timeframe="5m", since_years=1):
+    """
+    Attempts to fetch Futures data, falls back to Spot if blocked.
+    """
+    print(f"Attempting to fetch Futures data for {symbol}...")
+    df = fetch_binance_futures_data(symbol, timeframe, since_years)
+    
+    if df.empty:
+        print("Futures data fetch failed/blocked. Attempting Spot data fallback...")
+        exchange_spot = ccxt.binance({
+            'enableRateLimit': True,
+            'options': {'defaultType': 'spot'}
+        })
+        
+        now = datetime.now()
+        start_time = now - timedelta(days=365 * since_years)
+        since_ms = int(start_time.timestamp() * 1000)
+        
+        all_ohlcv = []
+        try:
+            # Spot usually has more restrictive pagination but we'll try a basic fetch
+            ohlcv = exchange_spot.fetch_ohlcv(symbol, timeframe, since=since_ms, limit=1000)
+            if ohlcv:
+                all_ohlcv.extend(ohlcv)
+                df = pd.DataFrame(all_ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+                df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+                df.set_index('timestamp', inplace=True)
+                df.sort_index(inplace=True)
+                print(f"Fallback successful: Fetched {len(df)} spot candles.")
+        except Exception as e:
+            print(f"Spot fallback also failed: {e}")
+            
+    return df
+
 def fetch_binance_futures_data(symbol="BTC/USDT", timeframe="5m", since_years=1):
+
     """
     Fetches historical OHLCV data from Binance Futures via CCXT.
     Handles pagination to get long-term data.

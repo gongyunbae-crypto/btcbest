@@ -129,8 +129,9 @@ def get_data(symbol, refresh=False):
     try:
         df = data_loader.load_data("btc_futures_data_5m.csv")
         if df is None or refresh:
-            df = data_loader.fetch_binance_futures_data(symbol, timeframe="5m", since_years=1)
-            data_loader.save_data(df, "btc_futures_data_5m.csv")
+            df = data_loader.fetch_binance_data_auto(symbol, timeframe="5m", since_years=1)
+            if not df.empty:
+                data_loader.save_data(df, "btc_futures_data_5m.csv")
         return df
     except: return None
 
