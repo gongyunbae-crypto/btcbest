@@ -278,12 +278,9 @@ def get_expanded_indicators(df):
     kijun_sen = ((s_high.rolling(26).max() + s_low.rolling(26).min()) / 2).to_numpy()
     # Span A, Span B, Chikou require shifting, keeping simple for now (Tenkan/Kijun Cross)
 
-    # 15. SuperTrend (Simplified Vectorized)
-    # Full recursive calculation is slow in Python. Using Basic Upper/Lower band logic approximation or simple trend.
-    # Approximation: If Close > EMA20 + ATR -> Bullish, Close < EMA20 - ATR -> Bearish
-    # We will use this "Trend ATR" as a proxy for SuperTrend signal.
-    st_upper = median_price + (3 * atr)
-    st_lower = median_price - (3 * atr)
+    # 15. SuperTrend (Proxy)
+    psar_long = (s_high.rolling(22).max() - (3 * atr)).to_numpy()
+    psar_short = (s_low.rolling(22).min() + (3 * atr)).to_numpy()
     # Logic will be in SignalRepository (Price > Lower vs Price < Upper)
 
     # 16. Parabolic SAR
@@ -299,51 +296,43 @@ def get_expanded_indicators(df):
     # --- Phase 21: Mega Expansion (User Request - Double Indicators) ---
 
     # 17. Donchian Channels (20)
-    # Breakout indicator
-    donchian_upper = high.rolling(20).max()
-    donchian_lower = low.rolling(20).min()
+    donchian_upper = s_high.rolling(20).max().to_numpy()
+    donchian_lower = s_low.rolling(20).min().to_numpy()
     donchian_mid = (donchian_upper + donchian_lower) / 2
 
     # 18. Vortex Indicator (VI)
-    # TR is already calc'd roughly as 'atr' * 14? No, need True Range sum.
-    # Recalc True Range 1-period
-    tr_1 = pd.concat([high - low, (high - close.shift(1)).abs(), (low - close.shift(1)).abs()], axis=1).max(axis=1)
-    vm_plus = (high - low.shift(1)).abs()
-    vm_minus = (low - high.shift(1)).abs()
+    tr_1 = pd.concat([s_high - s_low, (s_high - s_close.shift(1)).abs(), (s_low - s_close.shift(1)).abs()], axis=1).max(axis=1)
+    vm_plus = (s_high - s_low.shift(1)).abs()
+    vm_minus = (s_low - s_high.shift(1)).abs()
     
     tr14 = tr_1.rolling(14).sum()
-    vi_plus = vm_plus.rolling(14).sum() / tr14
-    vi_minus = vm_minus.rolling(14).sum() / tr14
+    vi_plus = (vm_plus.rolling(14).sum() / (tr14 + 1e-8)).to_numpy()
+    vi_minus = (vm_minus.rolling(14).sum() / (tr14 + 1e-8)).to_numpy()
 
     # 19. TRIX (Triple Exponential Average)
-    # 15-period default
-    ema1 = close.ewm(span=15, adjust=False).mean()
+    ema1 = s_close.ewm(span=15, adjust=False).mean()
     ema2 = ema1.ewm(span=15, adjust=False).mean()
     ema3 = ema2.ewm(span=15, adjust=False).mean()
-    trix = ema3.pct_change() * 100
+    trix = (ema3.pct_change() * 100).to_numpy()
 
     # 20. Force Index
-    # (Close - PrevClose) * Volume
-    fi = (close.diff(1) * df['volume']).ewm(span=13, adjust=False).mean()
+    fi = ((s_close.diff(1) * df['volume']).ewm(span=13, adjust=False).mean()).to_numpy()
 
     # 21. Ease of Movement (EOM)
     # Distance moved / Box Ratio
     # Box Ratio = (Vol / Scale) / (High - Low)
     # Scale often 10000 or 1000000 to make numbers readable.
-    dist_moved = ((high + low) / 2) - ((high.shift(1) + low.shift(1)) / 2)
-    box_ratio = (df['volume'] / 100000000) / ((high - low) + 0.00001) # Avoid div by zero
-    eom = (dist_moved / box_ratio).rolling(14).mean()
+    dist_moved = ((s_high + s_low) / 2) - ((s_high.shift(1) + s_low.shift(1)) / 2)
+    box_ratio = (df['volume'] / 100000000) / ((s_high - s_low) + 0.00001) # Avoid div by zero
+    eom = (dist_moved / box_ratio).rolling(14).mean().to_numpy()
 
     # 22. Chaikin Money Flow (CMF)
-    # MFM = ((Close - Low) - (High - Close)) / (High - Low)
-    # MFV = MFM * Vol
-    # CMF = Sum(MFV, 20) / Sum(Vol, 20)
-    mfm = ((close - low) - (high - close)) / ((high - low) + 1e-8)
+    mfm = ((s_close - s_low) - (s_high - s_close)) / ((s_high - s_low) + 1e-8)
     mfv = mfm * df['volume']
-    cmf = mfv.rolling(20).sum() / (df['volume'].rolling(20).sum() + 1e-8)
+    cmf = (mfv.rolling(20).sum() / (df['volume'].rolling(20).sum() + 1e-8)).to_numpy()
 
     # 23. VWMA (Volume Weighted Moving Average)
-    vwma_20 = (close * df['volume']).rolling(20).sum() / (df['volume'].rolling(20).sum() + 1e-8)
+    vwma_20 = ((s_close * df['volume']).rolling(20).sum() / (df['volume'].rolling(20).sum() + 1e-8)).to_numpy()
 
     # 24. Hull Moving Average (HMA)
     # WMA likely needed. Pandas doesn't have WMA built-in easily.
@@ -357,23 +346,15 @@ def get_expanded_indicators(df):
     # 2*EMA(n/2) - EMA(n) -> EMA(sqrt(n))
     # It behaves very similarly to HMA (responsive).
     hma_n = 9
-    ema_half = close.ewm(span=int(hma_n/2), adjust=False).mean()
-    ema_full = close.ewm(span=hma_n, adjust=False).mean()
+    ema_half = s_close.ewm(span=int(hma_n/2), adjust=False).mean()
+    ema_full = s_close.ewm(span=hma_n, adjust=False).mean()
     raw_hma = 2 * ema_half - ema_full
-    hma_9 = raw_hma.ewm(span=int(np.sqrt(hma_n)), adjust=False).mean()
+    hma_9 = raw_hma.ewm(span=int(np.sqrt(hma_n)), adjust=False).mean().to_numpy()
 
     # 25. Connors RSI (CRSI)
     # 1. RSI(3)
-    rsi_3 = vbt.RSI.run(close, window=3).rsi
-    
-    # 2. UpDown Streak RSI
-    # Streak: Days up vs Days down
-    # diff = close.diff()
-    # streak = ... (Hard to vectorise cleanly in pandas without loop or group quirks)
-    # Simplified CRSI: Just RSI(3) + RSI(ROC, 3)?
-    # Let's skip 'Streak RSI' part (complex) and make a "Fast RSI" composite.
-    # CRSI Proxy = (RSI(3) + RSI(ROC(1), 3)) / 2
-    rsi_roc = vbt.RSI.run(close.pct_change().fillna(0), window=3).rsi
+    rsi_3 = vbt.RSI.run(close, window=3).rsi.to_numpy()
+    rsi_roc = vbt.RSI.run(s_close.pct_change().fillna(0).to_numpy(), window=3).rsi.to_numpy()
     connors_rsi_proxy = (rsi_3 + rsi_roc) / 2
 
     # 26. Aroon
@@ -391,49 +372,38 @@ def get_expanded_indicators(df):
     # Let's Skip Aroon (Time-based high complexity) and use 'Ultimate Oscillator'.
 
     # 26. Ultimate Oscillator
-    # BP = Close - TrueLow
-    # TR = TrueHigh - TrueLow
-    # Avg7 = Sum(BP,7)/Sum(TR,7), Avg14..., Avg28...
-    # UO = (4*Avg7 + 2*Avg14 + Avg28) / 7 * 100
-    prev_close = close.shift(1)
-    true_low = pd.concat([low, prev_close], axis=1).min(axis=1)
-    true_high = pd.concat([high, prev_close], axis=1).max(axis=1)
-    bp = close - true_low
+    prev_close = s_close.shift(1)
+    true_low = pd.concat([s_low, prev_close], axis=1).min(axis=1)
+    true_high = pd.concat([s_high, prev_close], axis=1).max(axis=1)
+    bp = s_close - true_low
     tr_u = true_high - true_low
     
     avg7 = bp.rolling(7).sum() / (tr_u.rolling(7).sum() + 1e-8)
     avg14 = bp.rolling(14).sum() / (tr_u.rolling(14).sum() + 1e-8)
     avg28 = bp.rolling(28).sum() / (tr_u.rolling(28).sum() + 1e-8)
-    
-    ultimate = (4 * avg7 + 2 * avg14 + avg28) / 7 * 100
+    ultimate = ((4 * avg7 + 2 * avg14 + avg28) / 7 * 100).to_numpy()
 
     # 27. KST (Know Sure Thing)
-    # ROC10(10MA) + ROC15(10MA)...
-    # Simplified: RCMA1 = SMA(ROC(10), 10)
     def roc_ma(n, ma): 
-        return (close.diff(n)/close.shift(n)).rolling(ma).mean()
+        return (s_close.diff(n)/s_close.shift(n)).rolling(ma).mean()
     
-    rcma1 = roc_ma(10, 10)
-    rcma2 = roc_ma(15, 10)
-    rcma3 = roc_ma(20, 10)
-    rcma4 = roc_ma(30, 15)
-    
-    kst = (rcma1 * 1 + rcma2 * 2 + rcma3 * 3 + rcma4 * 4) * 100
-    kst_signal = kst.rolling(9).mean()
+    kst = ((roc_ma(10, 10) * 1 + roc_ma(15, 10) * 2 + roc_ma(20, 10) * 3 + roc_ma(30, 15) * 4) * 100)
+    kst_v = kst.to_numpy()
+    kst_signal_v = kst.rolling(9).mean().to_numpy()
 
     return {
-        'close': close, 'high': high, 'low': low, 'volume': df['volume'],
+        'close': close, 'high': high, 'low': low, 'volume': volume,
         'rsi': rsi_14, 'rsi_9': rsi_9, 'rsi_7': rsi_7,
         'ema_200': ema_200, 'ema_50': ema_50, 'ema_21': ema_21, 'ema_20': ema_20, 'ema_9': ema_9, 'ema_8': ema_8,
         'vol_sma': vol_sma,
-        'bb_up': bb_standard.upper, 'bb_low': bb_standard.lower,
-        'bb_up_short': bb_short.upper, 'bb_low_short': bb_short.lower,
-        'macd': macd_std.macd, 'macd_sig': macd_std.signal,
-        'macd_fast': macd_fast.macd, 'macd_fast_sig': macd_fast.signal,
-        'macd_scalp': macd_scalp.macd, 'macd_scalp_sig': macd_scalp.signal,
-        'stoch_k': stoch_std.percent_k, 'stoch_d': stoch_std.percent_d,
-        'stoch_fast_k': stoch_fast.percent_k, 'stoch_fast_d': stoch_fast.percent_d,
-        'vwap': vwap, 'obv': obv,
+        'bb_up': bb_upper, 'bb_low': bb_lower,
+        'bb_up_short': bb_short_upper, 'bb_low_short': bb_short_lower,
+        'macd': macd_val, 'macd_sig': macd_sig,
+        'macd_fast': macd_fast_val, 'macd_scalp': macd_scalp_val,
+        'stoch_k': stoch_k, 'stoch_d': stoch_d,
+        'stoch_fast_k': stoch_fast_k,
+        'vwap': vwap.to_numpy() if hasattr(vwap, "to_numpy") else vwap, 
+        'obv': obv,
         'atr': atr, 'adx': adx, 'cci': cci,
         'kc_upper': kc_upper, 'kc_lower': kc_lower,
         'williams_r': williams_r, 'ao': ao, 'roc': roc_9,
@@ -443,6 +413,8 @@ def get_expanded_indicators(df):
         'vi_plus': vi_plus, 'vi_minus': vi_minus,
         'trix': trix, 'fi': fi, 'eom': eom, 'cmf': cmf,
         'vwma_20': vwma_20, 'hma_9': hma_9, 'crsi': connors_rsi_proxy,
+        'ultimate': ultimate, 'kst': kst_v, 'kst_sig': kst_signal_v
+    }
         'ultimate': ultimate, 'kst': kst, 'kst_signal': kst_signal
     }
 
