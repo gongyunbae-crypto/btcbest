@@ -152,50 +152,49 @@ def get_expanded_indicators(df):
     
     # 1. Base Indicators
     # 1.1 Fast RSI (Scalping)
-    rsi_14 = vbt.RSI.run(close, window=14).rsi.values
-    rsi_9 = vbt.RSI.run(close, window=9).rsi.values
-    rsi_7 = vbt.RSI.run(close, window=7).rsi.values
+    rsi_14 = vbt.RSI.run(close, window=14).rsi.to_numpy()
+    rsi_9 = vbt.RSI.run(close, window=9).rsi.to_numpy()
+    rsi_7 = vbt.RSI.run(close, window=7).rsi.to_numpy()
     
-    ema_200 = vbt.MA.run(close, window=200, ewm=True).ma.values
-    ema_50 = vbt.MA.run(close, window=50, ewm=True).ma.values
-    ema_21 = vbt.MA.run(close, window=21, ewm=True).ma.values
-    ema_20 = vbt.MA.run(close, window=20, ewm=True).ma.values
-    ema_9 = vbt.MA.run(close, window=9, ewm=True).ma.values
-    ema_8 = vbt.MA.run(close, window=8, ewm=True).ma.values
+    ema_200 = vbt.MA.run(close, window=200, ewm=True).ma.to_numpy()
+    ema_50 = vbt.MA.run(close, window=50, ewm=True).ma.to_numpy()
+    ema_21 = vbt.MA.run(close, window=21, ewm=True).ma.to_numpy()
+    ema_20 = vbt.MA.run(close, window=20, ewm=True).ma.to_numpy()
+    ema_9 = vbt.MA.run(close, window=9, ewm=True).ma.to_numpy()
+    ema_8 = vbt.MA.run(close, window=8, ewm=True).ma.to_numpy()
     
     # Volume SMA
-    vol_sma = vbt.MA.run(volume, window=20).ma.values
+    vol_sma = vbt.MA.run(volume, window=20).ma.to_numpy()
     
     # 2. Bollinger Bands
     bb_standard = vbt.BBANDS.run(close, window=20, alpha=2.0)
     bb_short = vbt.BBANDS.run(close, window=10, alpha=2.0)
-    # Extract values
-    bb_upper = bb_standard.upper.values
-    bb_lower = bb_standard.lower.values
-    bb_middle = bb_standard.middle.values
-    bb_short_upper = bb_short.upper.values
-    bb_short_lower = bb_short.lower.values
+    # Extract values (using to_numpy() for safety across versions)
+    bb_upper = bb_standard.upper.to_numpy()
+    bb_lower = bb_standard.lower.to_numpy()
+    bb_middle = bb_standard.middle.to_numpy()
+    bb_short_upper = bb_short.upper.to_numpy()
+    bb_short_lower = bb_short.lower.to_numpy()
     
     # 3. MACD
     macd_std = vbt.MACD.run(close)
     macd_fast = vbt.MACD.run(close, fast_window=5, slow_window=13, signal_window=1)
-    macd_scalp = vbt.MACD.run(close, fast_window=8, slow_window=21, signal_window=5)
     # Extract values
-    macd_val = macd_std.macd.values
-    macd_sig = macd_std.signal.values
-    macd_fast_val = macd_fast.macd.values
-    macd_scalp_val = macd_scalp.macd.values
+    macd_val = macd_std.macd.to_numpy()
+    macd_sig = macd_std.signal.to_numpy()
+    macd_fast_val = macd_fast.macd.to_numpy()
+    macd_scalp_val = vbt.MACD.run(close, fast_window=8, slow_window=21, signal_window=5).macd.to_numpy()
     
     # 4. Stochastic
     stoch_std = vbt.STOCH.run(high, low, close) 
     stoch_fast = vbt.STOCH.run(high, low, close, k_window=5, d_window=3)
-    # Extract values
-    stoch_k = stoch_std.k.values
-    stoch_d = stoch_std.d.values
-    stoch_fast_k = stoch_fast.k.values
+    # Extract values (Standardizing to k and d)
+    stoch_k = stoch_std.percent_k.to_numpy()
+    stoch_d = stoch_std.percent_d.to_numpy()
+    stoch_fast_k = stoch_fast.percent_k.to_numpy()
     
     # 5. Volatility (ATR)
-    atr = vbt.ATR.run(high, low, close).atr.values
+    atr = vbt.ATR.run(high, low, close).atr.to_numpy()
     
     # 5.1 VWAP (Volume Weighted Average Price) - Cumulative or Session
     # For crypto, often rolling or cumulative since day start. 
@@ -205,7 +204,7 @@ def get_expanded_indicators(df):
     vwap = cv / v
     
     # 5.2 OBV (On Balance Volume)
-    obv = vbt.OBV.run(close, df['volume']).obv
+    obv = vbt.OBV.run(close, volume).obv.to_numpy()
 
     # 6. ADX (Trend Strength) - Manual Implementation
     plus_dm = high.diff()
