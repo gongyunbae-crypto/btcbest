@@ -27,7 +27,7 @@ wheels/
 .streamlit/secrets.toml
 
 # Data files (exclude large CSV, but keep strategy JSONs)
-*.csv
+# *.csv (Commented out to allow data upload for Streamlit Cloud deployment)
 
 # IDE
 .vscode/
