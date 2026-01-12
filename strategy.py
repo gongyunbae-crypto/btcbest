@@ -206,87 +206,76 @@ def get_expanded_indicators(df):
     # 5.2 OBV (On Balance Volume)
     obv = vbt.OBV.run(close, volume).obv.to_numpy()
 
-    # 6. ADX (Trend Strength) - Manual Implementation
-    plus_dm = high.diff()
-    minus_dm = low.diff()
+    # 6. ADX (Trend Strength) - Manual Implementation (Using pd.Series wrappers for numpy inputs)
+    s_high = pd.Series(high)
+    s_low = pd.Series(low)
+    s_close = pd.Series(close)
+    
+    plus_dm = s_high.diff()
+    minus_dm = s_low.diff()
     plus_dm[plus_dm < 0] = 0
     minus_dm[minus_dm > 0] = 0
     
-    tr1 = pd.DataFrame(high - low)
-    tr2 = pd.DataFrame(abs(high - close.shift(1)))
-    tr3 = pd.DataFrame(abs(low - close.shift(1)))
-    frames = [tr1, tr2, tr3]
-    tr = pd.concat(frames, axis=1, join='outer').max(axis=1)
+    tr1 = s_high - s_low
+    tr2 = (s_high - s_close.shift(1)).abs()
+    tr3 = (s_low - s_close.shift(1)).abs()
+    tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
     atr_adx = tr.ewm(alpha=1/14, min_periods=14).mean()
     
     plus_di = 100 * (plus_dm.ewm(alpha=1/14, min_periods=14).mean() / atr_adx)
-    minus_di = 100 * (abs(minus_dm).ewm(alpha=1/14, min_periods=14).mean() / atr_adx)
+    minus_di = 100 * (minus_dm.abs().ewm(alpha=1/14, min_periods=14).mean() / atr_adx)
     dx = (abs(plus_di - minus_di) / abs(plus_di + minus_di)) * 100
-    adx = dx.ewm(alpha=1/14, min_periods=14).mean()
+    adx = dx.ewm(alpha=1/14, min_periods=14).mean().to_numpy()
+    plus_di_v = plus_di.to_numpy()
+    minus_di_v = minus_di.to_numpy()
 
     # 7. CCI (Commodity Channel Index) - Manual Implementation
-    tp = (high + low + close) / 3
-    cci = (tp - tp.rolling(14).mean()) / (0.015 * tp.rolling(14).std())
+    tp = (s_high + s_low + s_close) / 3
+    cci = ((tp - tp.rolling(14).mean()) / (0.015 * tp.rolling(14).std())).to_numpy()
 
     # --- Phase 20: Modern Indicators Expansion (User Request) ---
 
     # 8. Keltner Channels (KC)
-    # Middle: EMA 20
-    # Upper: EMA 20 + 2 * ATR
-    # Lower: EMA 20 - 2 * ATR
     kc_upper = ema_20 + (2 * atr)
     kc_lower = ema_20 - (2 * atr)
 
     # 9. Williams %R
-    # (Highest High - Close) / (Highest High - Lowest Low) * -100
-    hh_14 = high.rolling(14).max()
-    ll_14 = low.rolling(14).min()
-    williams_r = ((hh_14 - close) / (hh_14 - ll_14)) * -100
+    hh_14 = s_high.rolling(14).max()
+    ll_14 = s_low.rolling(14).min()
+    williams_r = (((hh_14 - s_close) / (hh_14 - ll_14)) * -100).to_numpy()
 
     # 10. Awesome Oscillator (AO)
-    # SMA(Median Price, 5) - SMA(Median Price, 34)
-    median_price = (high + low) / 2
-    ao = median_price.rolling(5).mean() - median_price.rolling(34).mean()
+    median_price = (s_high + s_low) / 2
+    ao = (median_price.rolling(5).mean() - median_price.rolling(34).mean()).to_numpy()
 
     # 11. Rate of Change (ROC)
-    # ((Close - Close_n) / Close_n) * 100
-    roc_9 = ((close - close.shift(9)) / close.shift(9)) * 100
+    roc_9 = (((s_close - s_close.shift(9)) / s_close.shift(9)) * 100).to_numpy()
 
     # 12. Money Flow Index (MFI)
-    # Volume-weighted RSI
-    raw_money_flow = tp * df['volume']
+    raw_money_flow = tp * volume
     
     positive_flow = pd.Series(0.0, index=df.index)
     negative_flow = pd.Series(0.0, index=df.index)
     
-    # Vectorized Flow
     price_diff = tp.diff()
     positive_flow[price_diff > 0] = raw_money_flow[price_diff > 0]
     negative_flow[price_diff < 0] = raw_money_flow[price_diff < 0]
     
     mfi_ratio = positive_flow.rolling(14).sum() / negative_flow.rolling(14).sum()
-    mfi = 100 - (100 / (1 + mfi_ratio))
+    mfi = (100 - (100 / (1 + mfi_ratio))).to_numpy()
 
     # 13. Chande Momentum Oscillator (CMO)
-    # ((Sum(Up) - Sum(Down)) / (Sum(Up) + Sum(Down))) * 100
-    # Uses same Up/Down from RSI logic generally, but sum over window
-    diff_p = close.diff()
-    abs_diff = diff_p.abs()
-    
-    # Up/Down moves
-    # Using rolling sum directly
+    diff_p = s_close.diff()
     up_moves = diff_p.clip(lower=0)
     down_moves = diff_p.clip(upper=0).abs()
     
     sum_up = up_moves.rolling(9).sum()
     sum_down = down_moves.rolling(9).sum()
-    cmo = ((sum_up - sum_down) / (sum_up + sum_down)) * 100
+    cmo = (((sum_up - sum_down) / (sum_up + sum_down)) * 100).to_numpy()
 
     # 14. Ichimoku Cloud (Simplified)
-    # Tenkan-sen (Conversion Line): (9-period high + low)/2
-    # Kijun-sen (Base Line): (26-period high + low)/2
-    tenkan_sen = (high.rolling(9).max() + low.rolling(9).min()) / 2
-    kijun_sen = (high.rolling(26).max() + low.rolling(26).min()) / 2
+    tenkan_sen = ((s_high.rolling(9).max() + s_low.rolling(9).min()) / 2).to_numpy()
+    kijun_sen = ((s_high.rolling(26).max() + s_low.rolling(26).min()) / 2).to_numpy()
     # Span A, Span B, Chikou require shifting, keeping simple for now (Tenkan/Kijun Cross)
 
     # 15. SuperTrend (Simplified Vectorized)
