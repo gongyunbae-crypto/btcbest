@@ -141,8 +141,10 @@ with st.spinner("Loading Data..."):
         if 'composer' not in st.session_state: 
             st.session_state.composer = backtest.RandomStrategyComposer(df)
         elif not hasattr(st.session_state.composer, 'delete_strategy'):
-            # Force update if new methods are missing from session state object
             st.session_state.composer = backtest.RandomStrategyComposer(df)
+    else:
+        st.error("❌ 데이터를 불러올 수 없습니다. 바이낸스 API가 이 서버의 IP를 차단했거나 CSV 파일이 없습니다. 앱의 'Refresh Data' 버튼은 작동하지 않을 수 있습니다.")
+        st.stop()
             
         current_ts = time.time()
         if (current_ts % 300) < 10 and ('last_refresh' not in st.session_state or current_ts - st.session_state.last_refresh > 60):
