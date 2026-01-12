@@ -144,42 +144,58 @@ def get_expanded_indicators(df):
     """
     Calculates extended set of indicators for Creative Mining.
     """
-    close = df['close']
-    high = df['high']
-    low = df['low']
+    # Convert to pure float64 numpy arrays to prevent numba TypingError
+    close = df['close'].values.astype('float64')
+    high = df['high'].values.astype('float64')
+    low = df['low'].values.astype('float64')
+    volume = df['volume'].values.astype('float64')
     
     # 1. Base Indicators
     # 1.1 Fast RSI (Scalping)
-    rsi_14 = vbt.RSI.run(close, window=14).rsi
-    rsi_9 = vbt.RSI.run(close, window=9).rsi
-    rsi_7 = vbt.RSI.run(close, window=7).rsi
+    rsi_14 = vbt.RSI.run(close, window=14).rsi.values
+    rsi_9 = vbt.RSI.run(close, window=9).rsi.values
+    rsi_7 = vbt.RSI.run(close, window=7).rsi.values
     
-    ema_200 = vbt.MA.run(close, window=200, ewm=True).ma
-    ema_50 = vbt.MA.run(close, window=50, ewm=True).ma
-    ema_21 = vbt.MA.run(close, window=21, ewm=True).ma
-    ema_20 = vbt.MA.run(close, window=20, ewm=True).ma
-    ema_9 = vbt.MA.run(close, window=9, ewm=True).ma
-    ema_8 = vbt.MA.run(close, window=8, ewm=True).ma
+    ema_200 = vbt.MA.run(close, window=200, ewm=True).ma.values
+    ema_50 = vbt.MA.run(close, window=50, ewm=True).ma.values
+    ema_21 = vbt.MA.run(close, window=21, ewm=True).ma.values
+    ema_20 = vbt.MA.run(close, window=20, ewm=True).ma.values
+    ema_9 = vbt.MA.run(close, window=9, ewm=True).ma.values
+    ema_8 = vbt.MA.run(close, window=8, ewm=True).ma.values
     
     # Volume SMA
-    vol_sma = vbt.MA.run(df['volume'], window=20).ma
+    vol_sma = vbt.MA.run(volume, window=20).ma.values
     
     # 2. Bollinger Bands
     bb_standard = vbt.BBANDS.run(close, window=20, alpha=2.0)
     bb_short = vbt.BBANDS.run(close, window=10, alpha=2.0)
+    # Extract values
+    bb_upper = bb_standard.upper.values
+    bb_lower = bb_standard.lower.values
+    bb_middle = bb_standard.middle.values
+    bb_short_upper = bb_short.upper.values
+    bb_short_lower = bb_short.lower.values
     
     # 3. MACD
-    macd_std = vbt.MACD.run(close) # 12, 26, 9
+    macd_std = vbt.MACD.run(close)
     macd_fast = vbt.MACD.run(close, fast_window=5, slow_window=13, signal_window=1)
     macd_scalp = vbt.MACD.run(close, fast_window=8, slow_window=21, signal_window=5)
+    # Extract values
+    macd_val = macd_std.macd.values
+    macd_sig = macd_std.signal.values
+    macd_fast_val = macd_fast.macd.values
+    macd_scalp_val = macd_scalp.macd.values
     
     # 4. Stochastic
-    stoch_std = vbt.STOCH.run(high, low, close) # 14, 3
+    stoch_std = vbt.STOCH.run(high, low, close) 
     stoch_fast = vbt.STOCH.run(high, low, close, k_window=5, d_window=3)
-    stoch_scalp = vbt.STOCH.run(high, low, close, k_window=8, d_window=3)
+    # Extract values
+    stoch_k = stoch_std.k.values
+    stoch_d = stoch_std.d.values
+    stoch_fast_k = stoch_fast.k.values
     
     # 5. Volatility (ATR)
-    atr = vbt.ATR.run(high, low, close).atr
+    atr = vbt.ATR.run(high, low, close).atr.values
     
     # 5.1 VWAP (Volume Weighted Average Price) - Cumulative or Session
     # For crypto, often rolling or cumulative since day start. 
