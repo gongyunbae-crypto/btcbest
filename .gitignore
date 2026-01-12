@@ -26,9 +26,8 @@ wheels/
 # Streamlit
 .streamlit/secrets.toml
 
-# Data files
+# Data files (exclude large CSV, but keep strategy JSONs)
 *.csv
-*.json
 
 # IDE
 .vscode/

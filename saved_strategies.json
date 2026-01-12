@@ -1,0 +1,192 @@
+[
+    {
+        "Description": "EMA_20_Cross_50_Down AND Stoch_Oversold_20 [Enh-L20-S0.03-T0.12]",
+        "Logic": [
+            "EMA_20_Cross_50_Down",
+            "Stoch_Oversold_20",
+            "AND",
+            "Ichimoku_TK_Cross_Bull"
+        ],
+        "logic_tuple": [
+            16,
+            67,
+            0,
+            32
+        ],
+        "Leverage": 20,
+        "SL_Pct": 0.03,
+        "TP_Pct": 0.12,
+        "Return": 24.16096844800005,
+        "Win Rate": 1.0,
+        "Trades": 3,
+        "Monthly_Return": 0.3007409331259072,
+        "MDD": 0.004000000000000017,
+        "Score": 483.219368960001,
+        "train_return": 0.0,
+        "discovered_at": 0,
+        "Sharpe": 1.6565603469268637,
+        "Sortino": 0.0,
+        "Profit_Factor": 99.0,
+        "Max_Cons_Loss": 0,
+        "Added_Date": "2026-01-10 18:21",
+        "unoptimizable": false
+    },
+    {
+        "Description": "Donchian_Breakout_Upper AND EOM_Easy_Fall [Enh-L20-S0.05-T0.2]",
+        "Logic": [
+            "Donchian_Breakout_Upper",
+            "EOM_Easy_Fall",
+            "AND",
+            "RSI_Overbought_70"
+        ],
+        "logic_tuple": [
+            15,
+            24,
+            0,
+            62
+        ],
+        "Leverage": 20,
+        "SL_Pct": 0.05,
+        "TP_Pct": 0.2,
+        "Return": 16.96542030491798,
+        "Win Rate": 1.0,
+        "Trades": 3,
+        "Monthly_Return": 0.2655079621150882,
+        "MDD": 0.004,
+        "Score": 339.30840609835957,
+        "train_return": 0.0,
+        "discovered_at": 0,
+        "Sharpe": 1.3771274518126755,
+        "Sortino": 0.0,
+        "Profit_Factor": 99.0,
+        "Max_Cons_Loss": 0,
+        "Added_Date": "2026-01-10 02:04",
+        "unoptimizable": true
+    },
+    {
+        "Description": "EMA_20_Cross_50_Up AND Ichimoku_TK_Cross_Bull [Enh-L20-S0.03-T0.08]",
+        "Logic": [
+            "EMA_20_Cross_50_Up",
+            "Ichimoku_TK_Cross_Bull",
+            "AND",
+            "TRIX_Bullish_Zero"
+        ],
+        "logic_tuple": [
+            17,
+            32,
+            0,
+            69
+        ],
+        "Leverage": 20,
+        "SL_Pct": 0.03,
+        "TP_Pct": 0.08,
+        "Return": 11.00235724800003,
+        "Win Rate": 1.0,
+        "Trades": 3,
+        "Monthly_Return": 0.22457253923878628,
+        "MDD": 0.004000000000000015,
+        "Score": 220.04714496000057,
+        "train_return": 0.0,
+        "discovered_at": 0,
+        "Sharpe": 1.6548893515509875,
+        "Sortino": 190137516426936.4,
+        "Profit_Factor": 99.0,
+        "Max_Cons_Loss": 0,
+        "Added_Date": "2026-01-10 10:03",
+        "unoptimizable": true
+    },
+    {
+        "Description": "AO_Bullish_Zero_Cross AND CMF_Selling_Pressure [Enh-L20-S0.01-T0.05]",
+        "Logic": [
+            "AO_Bullish_Zero_Cross",
+            "CMF_Selling_Pressure",
+            "AND"
+        ],
+        "logic_tuple": [
+            3,
+            9,
+            0,
+            54
+        ],
+        "Leverage": 20,
+        "SL_Pct": 0.01,
+        "TP_Pct": 0.05,
+        "Return": 31.82692998582208,
+        "Win Rate": 0.43478260869565216,
+        "Trades": 253,
+        "Monthly_Return": 0.3292506909073585,
+        "MDD": 0.6680036696874736,
+        "Score": 114.49630001394773,
+        "train_return": 0.23584189466514235,
+        "discovered_at": "2026-01-09T07:18:55.553251",
+        "Sharpe": 2.398392212668711,
+        "Sortino": 0.43153916714063695,
+        "Profit_Factor": 1.5779651181112044,
+        "Max_Cons_Loss": 7,
+        "Added_Date": "2025-01-01 00:00",
+        "unoptimizable": true
+    },
+    {
+        "Description": "KST_Bullish_Cross AND Vortex_Bullish_Cross [Enh-L10-S0.03-T0.12]",
+        "Logic": [
+            "KST_Bullish_Cross",
+            "Vortex_Bullish_Cross",
+            "AND"
+        ],
+        "logic_tuple": [
+            36,
+            80,
+            0,
+            -1
+        ],
+        "Leverage": 10,
+        "SL_Pct": 0.03,
+        "TP_Pct": 0.12,
+        "Return": 35.30629628324097,
+        "Win Rate": 0.5652173913043478,
+        "Trades": 207,
+        "Monthly_Return": 0.34021242924052686,
+        "MDD": 0.8335770053521746,
+        "Score": 98.0933191233555,
+        "train_return": 0.4198847721602462,
+        "discovered_at": "2026-01-07T18:37:09.735487",
+        "Sharpe": 2.414554161609998,
+        "Sortino": 0.21839752108709903,
+        "Profit_Factor": 1.529645431449712,
+        "Max_Cons_Loss": 5,
+        "Added_Date": "2025-01-01 00:00",
+        "unoptimizable": true
+    },
+    {
+        "Description": "Vortex_Bearish_Cross AND RSI_9_Overbought_70 [Enh-L10-S0.03-T0.08]",
+        "Logic": [
+            "Vortex_Bearish_Cross",
+            "RSI_9_Overbought_70",
+            "AND",
+            "EOM_Easy_Rise"
+        ],
+        "logic_tuple": [
+            79,
+            60,
+            0,
+            25
+        ],
+        "Leverage": 10,
+        "SL_Pct": 0.03,
+        "TP_Pct": 0.08,
+        "Return": 150.86415044060928,
+        "Win Rate": 0.65,
+        "Trades": 100,
+        "Monthly_Return": 0.5060441552593675,
+        "MDD": 0.816700285709583,
+        "Score": 369.44801680712595,
+        "train_return": 0.0,
+        "discovered_at": 0,
+        "Sharpe": 2.9005481143814307,
+        "Sortino": 0.2092299715150002,
+        "Profit_Factor": 3.3834031931228594,
+        "Max_Cons_Loss": 4,
+        "Added_Date": "2026-01-11 13:33",
+        "unoptimizable": false
+    }
+]

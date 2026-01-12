@@ -1,0 +1,182 @@
+[
+    {
+        "Description": "Entry: (EMA_20_Cross_50_Up AND EMA_9_Cross_20_Down) | Lev: 5x",
+        "Logic": [
+            "EMA_20_Cross_50_Up",
+            "EMA_9_Cross_20_Down",
+            "AND"
+        ],
+        "Leverage": 5,
+        "SL_Pct": 0.01069219387039707,
+        "TP_Pct": 0.1,
+        "Return": 1.9471476666549135,
+        "Win Rate": 0.0,
+        "Trades": 0,
+        "Monthly Return": 0.3464591519124405,
+        "MDD": -0.48824765681668825,
+        "Score": 3.988032793337023,
+        "Train Return": 2.241371379043861
+    },
+    {
+        "Description": "Entry: (EMA_20_Cross_50_Up AND EMA_9_Cross_20_Down) | Lev: 3x",
+        "Logic": [
+            "EMA_20_Cross_50_Up",
+            "EMA_9_Cross_20_Down",
+            "AND"
+        ],
+        "Leverage": 3,
+        "SL_Pct": 0.01069219387039707,
+        "TP_Pct": 0.1,
+        "Return": 1.168288599992948,
+        "Win Rate": 0.0,
+        "Trades": 0,
+        "Monthly Return": 0.2373976584255717,
+        "MDD": -0.29294859409001295,
+        "Score": 3.9880327933370228,
+        "Train Return": 1.3448228274263168
+    },
+    {
+        "Description": "Entry: (EMA_20_Cross_50_Up AND EMA_9_Cross_20_Down) | Lev: 2x",
+        "Logic": [
+            "EMA_20_Cross_50_Up",
+            "EMA_9_Cross_20_Down",
+            "AND"
+        ],
+        "Leverage": 2,
+        "SL_Pct": 0.01069219387039707,
+        "TP_Pct": 0.1,
+        "Return": 0.7788590666619654,
+        "Win Rate": 0.0,
+        "Trades": 0,
+        "Monthly Return": 0.17178057928740587,
+        "MDD": -0.1952990627266753,
+        "Score": 3.9880327933370228,
+        "Train Return": 0.8965485516175445
+    },
+    {
+        "Description": "Entry: (EMA_20_Cross_50_Up AND EMA_9_Cross_20_Down) | Lev: 1x",
+        "Logic": [
+            "EMA_20_Cross_50_Up",
+            "EMA_9_Cross_20_Down",
+            "AND"
+        ],
+        "Leverage": 1,
+        "SL_Pct": 0.01069219387039707,
+        "TP_Pct": 0.1,
+        "Return": 0.3894295333309827,
+        "Win Rate": 0.0,
+        "Trades": 0,
+        "Monthly Return": 0.094744583979538,
+        "MDD": -0.09764953136333765,
+        "Score": 3.9880327933370228,
+        "Train Return": 0.44827427580877227
+    },
+    {
+        "Description": "Entry: (EMA_8_Cross_21_Down AND MACD_Scalp_Bull_Cross) | Lev: 2x",
+        "Logic": [
+            "EMA_8_Cross_21_Down",
+            "MACD_Scalp_Bull_Cross",
+            "AND"
+        ],
+        "Leverage": 2,
+        "SL_Pct": 0.040016795126741105,
+        "TP_Pct": 0.1,
+        "Return": 0.9051090494416371,
+        "Win Rate": 0.3333333333333333,
+        "Trades": 6,
+        "Monthly Return": 0.1941040127799627,
+        "MDD": -0.30690579079361746,
+        "Score": 2.9491429506792484,
+        "Train Return": 1.2518158314915206
+    },
+    {
+        "Description": "Entry: (EMA_8_Cross_21_Down AND MACD_Scalp_Bull_Cross) | Lev: 5x",
+        "Logic": [
+            "EMA_8_Cross_21_Down",
+            "MACD_Scalp_Bull_Cross",
+            "AND"
+        ],
+        "Leverage": 5,
+        "SL_Pct": 0.040016795126741105,
+        "TP_Pct": 0.1,
+        "Return": 2.262772623604093,
+        "Win Rate": 0.3333333333333333,
+        "Trades": 6,
+        "Monthly Return": 0.38469513962876545,
+        "MDD": -0.7672644769840437,
+        "Score": 2.9491429506792484,
+        "Train Return": 3.1295395787288016
+    },
+    {
+        "Description": "Entry: (EMA_8_Cross_21_Down AND MACD_Scalp_Bull_Cross) | Lev: 3x",
+        "Logic": [
+            "EMA_8_Cross_21_Down",
+            "MACD_Scalp_Bull_Cross",
+            "AND"
+        ],
+        "Leverage": 3,
+        "SL_Pct": 0.040016795126741105,
+        "TP_Pct": 0.1,
+        "Return": 1.3576635741624556,
+        "Win Rate": 0.3333333333333333,
+        "Trades": 6,
+        "Monthly Return": 0.2662455609749148,
+        "MDD": -0.4603586861904262,
+        "Score": 2.9491429506792484,
+        "Train Return": 1.877723747237281
+    },
+    {
+        "Description": "Entry: (EMA_8_Cross_21_Down AND MACD_Scalp_Bull_Cross) | Lev: 1x",
+        "Logic": [
+            "EMA_8_Cross_21_Down",
+            "MACD_Scalp_Bull_Cross",
+            "AND"
+        ],
+        "Leverage": 1,
+        "SL_Pct": 0.040016795126741105,
+        "TP_Pct": 0.1,
+        "Return": 0.45255452472081853,
+        "Win Rate": 0.3333333333333333,
+        "Trades": 6,
+        "Monthly Return": 0.10821393885476582,
+        "MDD": -0.15345289539680873,
+        "Score": 2.9491429506792484,
+        "Train Return": 0.6259079157457603
+    },
+    {
+        "Description": "Entry: (TRIX_Bearish_Zero AND EOM_Easy_Rise) | Lev: 5x",
+        "Logic": [
+            "TRIX_Bearish_Zero",
+            "EOM_Easy_Rise",
+            "AND"
+        ],
+        "Leverage": 5,
+        "SL_Pct": 0.013455807580731402,
+        "TP_Pct": 0.02,
+        "Return": 0.36129880815532034,
+        "Win Rate": 0.3333333333333333,
+        "Trades": 21,
+        "Monthly Return": 0.08859898725826021,
+        "MDD": -0.11361642186930365,
+        "Score": 2.786312024206042,
+        "Train Return": 0.3886567396393311
+    },
+    {
+        "Description": "Entry: (TRIX_Bearish_Zero AND EOM_Easy_Rise) | Lev: 10x",
+        "Logic": [
+            "TRIX_Bearish_Zero",
+            "EOM_Easy_Rise",
+            "AND"
+        ],
+        "Leverage": 10,
+        "SL_Pct": 0.027875101534569617,
+        "TP_Pct": 0.02,
+        "Return": 0.7225976163106407,
+        "Win Rate": 0.3333333333333333,
+        "Trades": 21,
+        "Monthly Return": 0.16146125584119697,
+        "MDD": -0.2272328437386073,
+        "Score": 2.786312024206042,
+        "Train Return": 0.7773134792786622
+    }
+]
