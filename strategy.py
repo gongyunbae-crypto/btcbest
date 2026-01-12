@@ -207,9 +207,9 @@ def get_expanded_indicators(df):
     obv = vbt.OBV.run(close, volume).obv.to_numpy()
 
     # 6. ADX (Trend Strength) - Manual Implementation (Using pd.Series wrappers for numpy inputs)
-    s_high = pd.Series(high)
-    s_low = pd.Series(low)
-    s_close = pd.Series(close)
+    s_high = pd.Series(high, index=df.index)
+    s_low = pd.Series(low, index=df.index)
+    s_close = pd.Series(close, index=df.index)
     
     plus_dm = s_high.diff()
     minus_dm = s_low.diff()
@@ -283,15 +283,8 @@ def get_expanded_indicators(df):
     psar_short = (s_low.rolling(22).min() + (3 * atr)).to_numpy()
     # Logic will be in SignalRepository (Price > Lower vs Price < Upper)
 
-    # 16. Parabolic SAR
-    # SAR is iterative. VBT doesn't have it built-in easily without TA-Lib.
-    # We will use "Volatile Stop" approximation: Highest High of last N periods - factor * ATR
-    # Or just skip precise SAR and use SuperTrend/Chandelier logic which is similar.
-    # User asked for SAR. Providing "PSAR_Proxy" (Chandelier Exit)
-    # Long Stop = Highest High (22) - 3 * ATR (22)
-    # Short Stop = Lowest Low (22) + 3 * ATR (22)
-    psar_long = high.rolling(22).max() - (3 * atr)
-    psar_short = low.rolling(22).min() + (3 * atr)
+    # PSAR / SuperTrend Proxy already calculated in Step 15 above.
+
 
     # --- Phase 21: Mega Expansion (User Request - Double Indicators) ---
 
